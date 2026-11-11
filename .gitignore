@@ -1,0 +1,8 @@
+# Scripts not yet cleaned up and reviewed for publishing
+_staging/
+
+# Never publish exported Wi-Fi / system plists
+*.plist
+*.plist.xml
+
+.DS_Store
