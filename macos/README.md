@@ -37,3 +37,51 @@ Battery      Good, 92% max capacity, 69 cycles
 ```
 
 Lines are skipped when they don't apply, e.g. no `Battery` line on a desktop Mac.
+
+## get_internet_accounts.sh
+
+Lists the accounts set up in **System Settings → Internet Accounts** (iCloud, Google,
+Microsoft Exchange, CalDAV, ...), with the account type, its name and the username.
+Useful for offboarding checks ("is a personal iCloud or Google account still signed in on
+this company Mac?") and for spotting accounts left behind by a previous user.
+
+### Requirements
+- **Full Disk Access** for whatever runs the script. The accounts database
+  (`~/Library/Accounts/Accounts4.sqlite`) is protected by macOS privacy controls.
+  - From Terminal: System Settings → Privacy & Security → Full Disk Access → add Terminal.
+  - From an MDM: deploy a PPPC profile that grants Full Disk Access to the MDM agent
+    (Jamf: `/usr/local/jamf/bin/jamf`; Intune: the Intune management agent).
+
+  Without it the script prints `Cannot read ... give Full Disk Access ...` and exits with 2.
+- Only tools built into macOS (`sqlite3`, `dscl`, `scutil`). The database is opened read-only.
+
+### Usage
+```bash
+get_internet_accounts.sh [-a] [-p] [-t] [-j] [-u user]
+```
+
+| Option | Meaning |
+|---|---|
+| `-a` | All: also list inactive accounts and child accounts (e.g. the calendar under a Google account) |
+| `-p` | Private: mask usernames, keeping the first letter and the domain (`j***@example.com`) |
+| `-t` | Tab-separated output with a header row, for spreadsheets |
+| `-j` | Wrap the output in `<result></result>` for a Jamf Pro extension attribute |
+| `-u user` | Read this user's accounts. By default it reads your own, or the logged-in user's when run as root |
+
+Exit codes: `0` ok, `1` bad option or no such user, `2` database missing or not readable.
+
+### Example
+```
+$ ./get_internet_accounts.sh -p
+Google | Work | j***@example.org
+iCloud | iCloud | j***@example.com
+```
+
+### Using it from Jamf or Intune
+Jamf extension attributes and Intune custom attributes can't take options, so set the
+defaults at the top of the script instead, for example `JAMF=1` and `MASK=1`.
+See the [mdm](../mdm/) folder for how to add a script to each. It runs as root and reads
+the logged-in user's accounts; if nobody is logged in, the result is `No user logged in`.
+
+Usernames are personal data. Check your privacy policy before collecting them across a
+fleet, and consider `MASK=1`.
