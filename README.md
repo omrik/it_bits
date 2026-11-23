@@ -11,3 +11,6 @@ IT scripts that are quick and useful - Just edit in vi
 | [macos](macos/) | `get_internet_accounts.sh` | List the accounts in Internet Accounts (iCloud, Google, Exchange...) on a Mac |
 | [ssl](ssl/) | `ssl_pfx_to_crt.sh` | Split a .pfx / .p12 into certificate, key, chain and fullchain PEM files |
 | [mdm](mdm/) | `get_*.sh` (8 scripts) | One-value Mac attributes for Jamf Pro extension attributes and Intune custom attributes |
+
+## More scripts
+- [junos_it](https://github.com/omrik/junos_it): Juniper switch scripts (SNMP inventory, run commands on many switches, re-enable ports, roll out ssh keys)
